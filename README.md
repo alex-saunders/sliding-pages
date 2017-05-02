@@ -8,7 +8,8 @@
 
 ## Usage
 
-The following code implements the `<sliding-pages>` element:
+`sliding-pages` looks for and defines pages as immediate div children, nested children of these divs will be ignored.
+The following HTML implements the `<sliding-pages>` element:
 
 ```html
 <sliding-pages active-index="1">
@@ -16,6 +17,9 @@ The following code implements the `<sliding-pages>` element:
     <h1>
       Page 1
     </h1>
+    <div>
+      Child div
+    </div>
   </div>
   <div>
     <h1>
@@ -30,13 +34,31 @@ The following code implements the `<sliding-pages>` element:
 </sliding-pages>
 ```
 
-![Example](https://media.giphy.com/media/l0IydXtLion5ge2pW/giphy.gif)
+With the corresponding JS:
+
+```html
+<script>
+const pages = document.querySelector('sliding-pages');
+
+function prevPage() {
+  const currIndex = parseInt(pages.getAttribute('active-index'));
+  pages.setAttribute('active-index', (currIndex - 1));
+}
+function nextPage() {
+  const currIndex = parseInt(pages.getAttribute('active-index'));
+  pages.setAttribute('active-index', (currIndex + 1))
+}
+</script>
+```
+
+![Example](https://media.giphy.com/media/xUA7aSwpe54mpHHzIk/giphy.gif)
+
 
 ## API Reference
 ### Properties
 
-| **active-index**  | *Number*                                                       |
-|                   | The index of the current active page (*note, this is 0-based)* |
+| Property          | Type     | Description                                                     |
+| **active-index**  | *Number* | The index of the current active page (*note, this is 0-based)*  |
 
 ### Methods
 
