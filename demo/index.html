@@ -11,9 +11,24 @@
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../../paper-styles/color.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../paper-button/paper-button.html">
     <link rel="import" href="../sliding-pages.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
+      * {
+        font-family: 'Roboto', sans-serif;
+      }
+
+        paper-button.indigo {
+    background-color: var(--paper-indigo-500);
+    color: white;
+    --paper-button-raised-keyboard-focus: {
+      background-color: var(--paper-pink-a200) !important;
+      color: white !important;
+    };
+  }
+
       .container {
         width: 100%;
         height: 80vh;
@@ -98,10 +113,10 @@
                 </div>
               </sliding-pages>
             </div>
-
-            <button onclick="prevPage()">Previous Page</button>
-            <button onclick="nextPage()">Next Page</button>
-            <input type="number" placeholder="Page Index" id="pageIndex" value="1">
+            <paper-button raised class="indigo">raised</paper-button>
+            <button onclick="prevPage()">Previous Page (active-index--)</button>
+            <button onclick="nextPage()">Next Page (active-index++)</button>
+            <input type="number" placeholder="active-index" id="pageIndex">
         </template>
       </demo-snippet>
     </div>

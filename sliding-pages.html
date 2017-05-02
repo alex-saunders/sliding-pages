@@ -100,6 +100,7 @@
           this.startDx = this.prevDx;
           return this._handleUp(evt);
         }
+
         
         this.prevDx = this.startDx;
         this.startDx = Math.abs(evt.detail.dx);
@@ -139,11 +140,13 @@
         let speed = dist / time;
         speed = Math.max(speed, minSpeed);
 
-        const distToCover = this.activePageWidth - Math.abs(evt.detail.dx);
+        const distToCover = Math.abs(this.activePageWidth - Math.abs(evt.detail.dx));
+        console.log('distToCover', distToCover);
         time = (distToCover / Math.abs(speed)) / 1000;
 
         const transition = `${time}s linear`;
 
+        // track has gone 60 left, bring in page to the right
         if (evt.detail.dx >= (60)) {
           if (this.activeIndex <= 0) {
             return;
@@ -153,6 +156,7 @@
           this._alterClasses(this.pages[this.activeIndex - 1], transition);
         }
 
+        // track has gone 60 right, bring in page to the left
         if (evt.detail.dx <= (-60)) {
           if (this.activeIndex >= this.pages.length - 1) {
             return;
@@ -164,6 +168,7 @@
 
         this._sortPages(transition);
       }
+
       _propertyChanged() {
         if (this.initialised) {
           if ((this.activeIndex < 0) || (this.activeIndex >= this.pages.length)) {
