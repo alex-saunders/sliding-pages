@@ -54,26 +54,6 @@
         margin-top: 8px;
       }
     </style>
-    <script>
-      const pages = document.querySelector('sliding-pages');
-
-      function prevPage() {
-        const currIndex = parseInt(pages.getAttribute('active-index'));
-        pages.setAttribute('active-index', (currIndex - 1));
-      }
-      function nextPage() {
-        const currIndex = parseInt(pages.getAttribute('active-index'));
-        pages.setAttribute('active-index', (currIndex + 1))
-      }
-
-      const input = document.getElementById('pageIndex');
-      input.addEventListener('change', (e) => {
-        e.preventDefault();
-
-        const index = parseInt(e.target.value);
-        pages.setAttribute('active-index', index);
-      })
-    </script>
   </template>
 </custom-element-demo>
 ```
@@ -119,6 +99,32 @@
   <input type="number" placeholder="Page Index" id="pageIndex" value="1">
 </div>
 ```
+<!---
+```
+<custom-element-demo>
+  <template>
+    <script>
+      const pages = document.querySelector('sliding-pages');
+
+      function prevPage() {
+        const currIndex = parseInt(pages.getAttribute('active-index'));
+        pages.setAttribute('active-index', (currIndex - 1));
+      }
+      function nextPage() {
+        const currIndex = parseInt(pages.getAttribute('active-index'));
+        pages.setAttribute('active-index', (currIndex + 1))
+      }
+
+      const input = document.getElementById('pageIndex');
+      input.addEventListener('change', (e) => {
+        e.preventDefault();
+
+        const index = parseInt(e.target.value);
+        pages.setAttribute('active-index', index);
+      })
+    </script>
+  </template>
+</custom-element-demo>
 
 ## Install the Polymer-CLI
 
