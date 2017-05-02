@@ -8,7 +8,7 @@
 
 ## Usage
 
-`sliding-pages` looks for and defines pages as immediate div children, nested children of these divs will be ignored.
+`sliding-pages` looks for and defines pages as immediate div children and forms an array using these, which the property `active-index` is based on. Nested children of these divs will be ignored.
 The following HTML implements the `<sliding-pages>` element:
 
 ```html
@@ -60,6 +60,7 @@ function nextPage() {
 | Property          | Type     | Description                                                     |
 | ----------------- | -------- | --------------------------------------------------------------- |          
 | **active-index**  | *Number* | The index of the current active page (*note, this is 0-based)*  |
+
 
 ### Methods
 
