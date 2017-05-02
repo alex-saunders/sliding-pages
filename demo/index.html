@@ -12,7 +12,6 @@
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../../paper-styles/color.html">
     <link rel="import" href="../../paper-styles/typography.html">
-    <link rel="import" href="../../paper-button/paper-button.html">
     <link rel="import" href="../sliding-pages.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -83,9 +82,9 @@
                   <h1>
                     Page 1
                   </h1>
-                  <div>
+                  <!--<div>
                     Child div
-                  </div>
+                  </div>-->
                 </div>
 
                 <div>
@@ -113,7 +112,6 @@
                 </div>
               </sliding-pages>
             </div>
-            <paper-button raised class="indigo">raised</paper-button>
             <button onclick="prevPage()">Previous Page (active-index--)</button>
             <button onclick="nextPage()">Next Page (active-index++)</button>
             <input type="number" placeholder="active-index" id="pageIndex">
