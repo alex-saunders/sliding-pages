@@ -58,6 +58,7 @@ function nextPage() {
 ### Properties
 
 | Property          | Type     | Description                                                     |
+| ----------------- | -------- | --------------------------------------------------------------- |          
 | **active-index**  | *Number* | The index of the current active page (*note, this is 0-based)*  |
 
 ### Methods
