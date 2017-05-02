@@ -8,7 +8,6 @@
 
 @demo demo/index.html
 -->
-
 <dom-module id="sliding-pages">
   <template>
     <style>
@@ -92,29 +91,19 @@
 
       _handleTrack(evt) {
         if (evt.detail.state === "start") {
-          this.activePageRect = this.pages[this.activeIndex].ref.getBoundingClientRect();
-          this.activePageWidth = this.activePageRect.width;
+          this.activePageWidth = this.pages[this.activeIndex].ref.getBoundingClientRect().width;
           this.startX = evt.detail.x;
           return;
-        }
-
-        // ensure touch is at edge of container
-        if (((this.startX - this.activePageRect.left) > 40) &&
-          ((this.startX - this.activePageRect.left) < (this.activePageRect.width - 40))) {
-          // return;
         }
 
         if (evt.detail.state === "end") {
           this.startDx = this.prevDx;
           return this._handleUp(evt);
         }
-
         
         this.prevDx = this.startDx;
         this.startDx = Math.abs(evt.detail.dx);
-
         this.startTime = new Date().getTime();
-        
 
         const dx = evt.detail.dx;
         const ratio = (dx / this.activePageWidth) * 80;
@@ -145,19 +134,23 @@
         this.endDx = Math.abs(evt.detail.dx);
 
         const dist = this.startDx - this.endDx;
+        const minSpeed = this.activePageWidth / 300;
         let time = this.endTime - this.startTime;
         let speed = dist / time;
-        let minSpeed = this.activePageWidth / 300;
         speed = Math.max(speed, minSpeed);
 
         const distToCover = this.activePageWidth - Math.abs(evt.detail.dx);
         time = (distToCover / Math.abs(speed)) / 1000;
+
+        const transition = `${time}s linear`;
 
         if (evt.detail.dx >= (60)) {
           if (this.activeIndex <= 0) {
             return;
           }
           this.activeIndex--;
+        } else if (evt.detail.dx > 0) {
+          this._alterClasses(this.pages[this.activeIndex - 1], transition);
         }
 
         if (evt.detail.dx <= (-60)) {
@@ -165,9 +158,10 @@
             return;
           }
           this.activeIndex++;
-        } 
+        } else if (evt.detail.dx < 0) {
+          this._alterClasses(this.pages[this.activeIndex + 1], transition);
+        }
 
-        const transition = `${time}s linear`;
         this._sortPages(transition);
       }
       _propertyChanged() {
@@ -255,17 +249,22 @@
           page.initialised = true;
       }
       _sortPages(animateTime) {
-        if (this.activeIndex > 0) {
-            for (var i = 0; i < this.activeIndex; i++) {
-                // const animate = (this.prevPage && (this.pages[i] === this.prevPage)) ? animateTime : false;
-                this._outLeft(this.pages[i], animateTime)
-            }
+        if (this.activeIndex < 0 || this.activeIndex >= this.pages.length) {
+          return;
         }
-        if (this.activeIndex < (this.pages.length - 1)) {
-            for (var i = this.activeIndex + 1; i < this.pages.length; i++) {
-                // const animate = (this.prevPage && (this.pages[i] === this.prevPage)) ? animateTime: false;
-                this._outRight(this.pages[i], animateTime)
-            }
+
+        for (var i = 0; i < this.pages.length; i++) {
+          if (i === this.activeIndex) {
+            continue;
+          }
+
+          const animate = (this.prevPage && (this.pages[i] === this.prevPage)) ? animateTime : false;
+          if (i < this.activeIndex) {
+            this._outLeft(this.pages[i], animate);
+          }
+          if (i > this.activeIndex) {
+            this._outRight(this.pages[i], animate);
+          }
         }
         this._in(this.activeIndex, animateTime)
       }
