@@ -61,7 +61,6 @@ function nextPage() {
 | ----------------- | -------- | --------------------------------------------------------------- |          
 | **active-index**  | *Number* | The index of the current active page (*note, this is 0-based)*  |
 
-
-### Methods
+### Methods
 
 `<sliding-pages>` has no public methods as it's behaviour is purely defined by the `active-index` property. I.e. to go to the next page, increment active-index and to go to the previous page, decrement. This property is both observed and reflects to attribute i.e. one can manually change the active-index property to trigger a page change or if the page is swiped left or right, the active-index property will update to display this.
