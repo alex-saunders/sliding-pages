@@ -1,0 +1,285 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<!--<link rel="import" href="../polymer/lib/elements/dom-if.html">-->
+<!--<link rel="import" href="../polymer/lib/elements/dom-repeat.html">-->
+
+<!--
+`sliding-pages`
+
+
+@demo demo/index.html
+-->
+
+<dom-module id="sliding-pages">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      :host ::slotted(*) {
+        box-sizing: border-box;
+      }
+
+      :host ::slotted(div) {
+        display: block;
+        position: absolute;
+        opacity: 1;
+        padding: 8px;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        box-shadow: 0px 0 6px 2px rgba(0,0,0,0.2);
+        background-color: var(--page-background-color, #fff);
+        z-index: 2;
+      }
+      :host ::slotted(.right) {
+        transform: translateX(100%);
+        z-index: 3;
+      }
+      :host ::slotted(.left) {
+        transform: translateX(-80px);
+        z-index: 1;
+      }
+      :host ::slotted(.out) {
+        display: none !important;
+      }
+    </style>
+    <slot></slot>
+  </template>
+
+  <script>
+    /** @polymerElement */
+    class SlidingPages extends Polymer.Element {
+      static get is() { return 'sliding-pages'; }
+      static get properties() {
+        return {
+          message: {
+            type: String,
+            value: 'sliding-pages'
+          },
+          activeIndex: {
+            type: Number,
+            value: 0,
+            notify: true,
+            reflectToAttribute: true,
+            observer: '_propertyChanged',
+          }
+        };
+      }
+      constructor() {
+        super();
+
+        Polymer.Gestures.addListener(this, 'track', e => this._handleTrack(e));
+      }
+      connectedCallback() {
+        super.connectedCallback();
+        
+        this.pages = [];
+
+        this.initialised = false;
+        this.prevPage = null;
+        this.activePage = null;
+
+        this._initPages();
+
+      }
+
+      _handleTrack(evt) {
+        if (evt.detail.state === "start") {
+          this.activePageRect = this.pages[this.activeIndex].ref.getBoundingClientRect();
+          this.activePageWidth = this.activePageRect.width;
+          this.startX = evt.detail.x;
+          return;
+        }
+
+        // ensure touch is at edge of container
+        if (((this.startX - this.activePageRect.left) > 40) &&
+          ((this.startX - this.activePageRect.left) < (this.activePageRect.width - 40))) {
+          // return;
+        }
+
+        if (evt.detail.state === "end") {
+          this.startDx = this.prevDx;
+          return this._handleUp(evt);
+        }
+
+        
+        this.prevDx = this.startDx;
+        this.startDx = Math.abs(evt.detail.dx);
+
+        this.startTime = new Date().getTime();
+        
+
+        const dx = evt.detail.dx;
+        const ratio = (dx / this.activePageWidth) * 80;
+
+        if (dx > 0) {
+          if (this.activeIndex <= 0) {
+            return;
+          }
+          this.pages[this.activeIndex - 1].ref.classList.remove('out');
+          this.pages[this.activeIndex - 1].ref.classList.remove('left');
+          this.pages[this.activeIndex - 1].ref.style.transform = `translateX(${-(80 - ratio)}px)`;
+          this.pages[this.activeIndex].ref.style.transform = `translateX(${dx}px)`;
+        }
+        if (dx < 0) {
+          if (this.activeIndex >= this.pages.length - 1) {
+            return;
+          }
+          this.pages[this.activeIndex + 1].ref.classList.remove('out');
+          this.pages[this.activeIndex + 1].ref.classList.remove('right');
+          this.pages[this.activeIndex + 1].ref.style.transform = `translateX(${this.activePageWidth - -dx}px)`;
+          this.pages[this.activeIndex].ref.style.transform = `translateX(${ratio}px)`;
+        }
+      }
+
+      _handleUp(evt) {
+
+        this.endTime = new Date().getTime();
+        this.endDx = Math.abs(evt.detail.dx);
+
+        const dist = this.startDx - this.endDx;
+        let time = this.endTime - this.startTime;
+        let speed = dist / time;
+        let minSpeed = this.activePageWidth / 300;
+        speed = Math.max(speed, minSpeed);
+
+        const distToCover = this.activePageWidth - Math.abs(evt.detail.dx);
+        time = (distToCover / Math.abs(speed)) / 1000;
+
+        if (evt.detail.dx >= (60)) {
+          if (this.activeIndex <= 0) {
+            return;
+          }
+          this.activeIndex--;
+        }
+
+        if (evt.detail.dx <= (-60)) {
+          if (this.activeIndex >= this.pages.length - 1) {
+            return;
+          }
+          this.activeIndex++;
+        } 
+
+        const transition = `${time}s linear`;
+        this._sortPages(transition);
+      }
+      _propertyChanged() {
+        if (this.initialised) {
+          if ((this.activeIndex < 0) || (this.activeIndex >= this.pages.length)) {
+            return;
+          }
+          this.prevPage = this.activePage;
+          const transition = '0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+          this._sortPages(transition);
+        }
+      }
+
+      _initPages() {
+        const temp = Polymer.dom(this).querySelectorAll(':scope > div');
+        for (let page of temp) {
+          const obj = {
+            ref: page,
+            initialised: true,
+            transitioning: false,
+          }
+          page.addEventListener('transitionend', (evt) => {
+            if (evt.propertyName === "transform") {
+              this._resetTransition(obj);
+            }
+          });
+          this.pages.push(obj);
+        }
+        
+        this._sortPages();
+        this._hideHiddenPages();
+
+        this.initialised = true;         
+      }
+
+      _alterClasses(page, transition) {
+        page.ref.style.transform = '';
+
+        if (transition) {
+            page.ref.style.transition = `all ${transition}`;
+            page.transitioning = true;
+        }
+      }
+
+      _resetTransition(page) {
+        page.transitioning = false;
+        page.ref.style.transition = '';
+
+        if (page === this.pages[this.activeIndex]) {
+          this._hideHiddenPages();
+        }
+      }
+
+      _outRight(page, animate) {
+        this._alterClasses(page, animate);
+
+        page.ref.classList.remove('left');
+        page.ref.classList.add('right');
+      }
+
+      _outLeft(page, animate) {
+        this._alterClasses(page, animate);
+        
+        page.ref.classList.remove('right');
+        page.ref.classList.add('left');
+      }
+
+      _in(pageIndex, animate) {
+          this.activeIndex = pageIndex;
+          
+          const page = this.pages[pageIndex];
+          this.activePage = page;
+
+          page.ref.classList.remove('out');
+      
+          this._alterClasses(page, animate, true);
+
+          requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                  page.ref.classList.remove('left');
+                  page.ref.classList.remove('right');
+              });
+          });
+
+          page.initialised = true;
+      }
+      _sortPages(animateTime) {
+        if (this.activeIndex > 0) {
+            for (var i = 0; i < this.activeIndex; i++) {
+                // const animate = (this.prevPage && (this.pages[i] === this.prevPage)) ? animateTime : false;
+                this._outLeft(this.pages[i], animateTime)
+            }
+        }
+        if (this.activeIndex < (this.pages.length - 1)) {
+            for (var i = this.activeIndex + 1; i < this.pages.length; i++) {
+                // const animate = (this.prevPage && (this.pages[i] === this.prevPage)) ? animateTime: false;
+                this._outRight(this.pages[i], animateTime)
+            }
+        }
+        this._in(this.activeIndex, animateTime)
+      }
+
+      _hideHiddenPages() {     
+        for (let page of this.pages) {
+          page.ref.style.transition = '';
+          if (page !== this.pages[this.activeIndex]) {
+            page.ref.classList.add('out');
+          }
+        }     
+      }
+    }
+
+    window.customElements.define(SlidingPages.is, SlidingPages);
+  </script>
+</dom-module>

@@ -1,0 +1,27 @@
+{
+  "name": "sliding-pages",
+  "main": "sliding-pages.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.0-rc.2",
+    "paper-styles": "PolymerElements/paper-styles#^1.2.1"
+  },
+  "devDependencies": {
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#2.0-preview",
+    "web-component-tester": "^6.0.0-prerelease.5",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0-rc.5"
+  },
+  "resolutions": {
+    "polymer": "^2.0.0-rc.2"
+  },
+  "homepage": "https://github.com/alex-saunders/sliding-pages",
+  "_release": "b8a5041be6",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "b8a5041be6db991cfd7ed65c30c88a1f1b8e69ca"
+  },
+  "_source": "https://github.com/alex-saunders/sliding-pages.git",
+  "_target": "master",
+  "_originalSource": "alex-saunders/sliding-pages",
+  "_direct": true
+}
