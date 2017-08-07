@@ -1,133 +1,149 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>sliding-pages demo</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <title>sliding-pages demo</title>
 
-    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-    <link rel="import" href="../../paper-styles/color.html">
-    <link rel="import" href="../../paper-styles/typography.html">
-    <link rel="import" href="../sliding-pages.html">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
-    <style is="custom-style" include="demo-pages-shared-styles">
-      * {
-        font-family: 'Roboto', sans-serif;
-      }
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../../paper-styles/color.html">
+  <link rel="import" href="../../paper-styles/typography.html">
+  <link rel="import" href="../sliding-pages.html">
 
-        paper-button.indigo {
-    background-color: var(--paper-indigo-500);
-    color: white;
-    --paper-button-raised-keyboard-focus: {
-      background-color: var(--paper-pink-a200) !important;
-      color: white !important;
-    };
-  }
+  <style is="custom-style" include="demo-pages-shared-styles">
+    * {
+      font-family: 'Roboto', sans-serif;
+    }
 
-      .container {
-        width: 100%;
-        height: 80vh;
-        position: relative;
-        margin-bottom: 8px;
+    paper-button.indigo {
+      background-color: var(--paper-indigo-500);
+      color: white;
+      --paper-button-raised-keyboard-focus: {
+        background-color: var(--paper-pink-a200) !important;
+        color: white !important;
       }
-      sliding-pages > div {
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        user-select: none;
-        cursor: pointer;
-      }
-      paper-fab:nth-of-type(1) {
-        left: 8px;
-      }
-      paper-fab:nth-of-type(2) {
-        right: 8px;
-      } 
-      sliding-pages div:nth-of-type(1) {
-          --page-background-color: var(--paper-red-500);
-      }
-      sliding-pages div:nth-of-type(2) {
-          --page-background-color: var(--paper-blue-500);
-      }
-      sliding-pages div:nth-of-type(3) {
-          --page-background-color: var(--paper-green-500);
-      }
-      sliding-pages div:nth-of-type(4) {
-          --page-background-color: var(--paper-yellow-500);
-      }
-      sliding-pages div:nth-of-type(5) {
-          --page-background-color: var(--paper-purple-500);
-      }
+      ;
+    }
 
-      input {
-        display: block;
-        margin-top: 8px;
-      }
-    </style>
-  </head>
-  <body>
+    .container {
+      width: 100%;
+      height: 80vh;
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    sliding-pages>div {
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    paper-fab:nth-of-type(1) {
+      left: 8px;
+    }
+
+    paper-fab:nth-of-type(2) {
+      right: 8px;
+    }
+
+    sliding-pages div:nth-of-type(1) {
+      --page-background-color: var(--paper-red-500);
+    }
+
+    sliding-pages div:nth-of-type(2) {
+      --page-background-color: var(--paper-blue-500);
+    }
+
+    sliding-pages div:nth-of-type(3) {
+      --page-background-color: var(--paper-green-500);
+    }
+
+    sliding-pages div:nth-of-type(4) {
+      --page-background-color: var(--paper-yellow-500);
+    }
+
+    sliding-pages div:nth-of-type(5) {
+      --page-background-color: var(--paper-purple-500);
+    }
+
+    input {
+      display: block;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <demo-snippet>
     <div class="vertical-section-container centered">
       <h3>Basic sliding-pages demo</h3>
-      <demo-snippet>
+      <dom-bind>
         <template>
           <div class="container">
-            <sliding-pages active-index="1">
+            <sliding-pages active-index="{{activeIndex}}" swipe-threshold="0.4" id="slidingPages">
+              <div>
+                <h1>
+                  Page 1
+                </h1>
                 <div>
-                  <h1>
-                    Page 1
-                  </h1>
-                  <div>
-                    Child div
-                  </div>
+                  Child div
                 </div>
+              </div>
 
-                <div>
-                  <h1>
-                    Page 2
-                  </h1>
-                </div>
+              <div>
+                <h1>
+                  Page 2
+                </h1>
+              </div>
 
-                <div>
-                  <h1>
-                    Page 3
-                  </h1>
-                </div>
+              <div>
+                <h1>
+                  Page 3
+                </h1>
+              </div>
 
-                <div>
-                  <h1>
-                    Page 4
-                  </h1>
-                </div>
+              <div>
+                <h1>
+                  Page 4
+                </h1>
+              </div>
 
-                <div>
-                  <h1>
-                    Page 5
-                  </h1>
-                </div>
-              </sliding-pages>
-            </div>
-            <button onclick="prevPage()">Previous Page (active-index--)</button>
-            <button onclick="nextPage()">Next Page (active-index++)</button>
-            <input type="number" placeholder="active-index" id="pageIndex">
+              <div>
+                <h1>
+                  Page 5
+                </h1>
+              </div>
+            </sliding-pages>
+          </div>
+          <button onclick="prevPage()">Previous Page (active-index--)</button>
+          <button onclick="nextPage()">Next Page (active-index++)</button>
+          <input type="number" placeholder="active-index" id="pageIndex">
+          <div>Threshold: [[swipeThreshold]]</div>
+          <div>Active index: [[activeIndex]]</div>
         </template>
-      </demo-snippet>
+      </dom-bind>
     </div>
     <script>
       const pages = document.querySelector('sliding-pages');
 
       function prevPage() {
         const currIndex = parseInt(pages.getAttribute('active-index'));
-        pages.setAttribute('active-index', (currIndex - 1));
+        //pages.setAttribute('active-index', (currIndex - 1));
+        document.querySelector('pageIndex').activeIndex = currIndex - 1;
       }
       function nextPage() {
         const currIndex = parseInt(pages.getAttribute('active-index'));
-        pages.setAttribute('active-index', (currIndex + 1))
+        //pages.setAttribute('active-index', (currIndex + 1))
+        document.querySelector('pageIndex').activeIndex = currIndex + 1;
       }
 
       const input = document.getElementById('pageIndex');
@@ -135,8 +151,12 @@
         e.preventDefault();
 
         const index = parseInt(e.target.value);
-        pages.setAttribute('active-index', index);
-      })
+        console.log(index)
+        document.querySelector('pageIndex').activeIndex = index;
+        //pages.setAttribute('active-index', index);
+      });
     </script>
-  </body>
+  </demo-snippet>
+</body>
+
 </html>
