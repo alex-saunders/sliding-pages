@@ -124,8 +124,7 @@
 
         const ratio = (dx / this.activePageWidth) * 80;
         const distToCover = Math.abs(this.activePageWidth - Math.abs(dx));
-        this._setSwipeRatio((Math.abs(dx) / this.activePageWidth) * 100);
-        if (dx > 0) {
+        if (dx > 0 && Math.abs(dx) <= this.activePageWidth) {
           if (this.activeIndex <= 0) {
             return;
           }
@@ -133,8 +132,9 @@
           this.pages[this.activeIndex - 1].ref.classList.remove('left');
           this.pages[this.activeIndex - 1].ref.style.transform = `translateX(${-(80 - ratio)}px)`;
           this.pages[this.activeIndex].ref.style.transform = `translateX(${dx}px)`;
+          this._setSwipeRatio((Math.abs(dx) / this.activePageWidth) * 100);
         }
-        if (dx < 0) {
+        if (dx < 0 && Math.abs(dx) <= this.activePageWidth) {
           if (this.activeIndex >= this.pages.length - 1) {
             return;
           }
@@ -142,6 +142,7 @@
           this.pages[this.activeIndex + 1].ref.classList.remove('right');
           this.pages[this.activeIndex + 1].ref.style.transform = `translateX(${this.activePageWidth - -dx}px)`;
           this.pages[this.activeIndex].ref.style.transform = `translateX(${ratio}px)`;
+          this._setSwipeRatio((Math.abs(dx) / this.activePageWidth) * 100);
         }
       }
 
@@ -190,6 +191,7 @@
           this._sortPages(transition);
         }
         this._sortPages(transition);
+        this._setSwipeRatio(0);
       }
 
       _propertyChanged() {
