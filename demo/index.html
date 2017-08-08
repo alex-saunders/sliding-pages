@@ -127,7 +127,7 @@
           <button onclick="prevPage()">Previous Page (active-index--)</button>
           <button onclick="nextPage()">Next Page (active-index++)</button>
           <input type="number" placeholder="active-index" id="pageIndex">
-          <div>Active index: [[activeIndex]]</div>
+          <div>Active index: <span id="activeIndex">[[activeIndex]]</span></div>
           <div>Swipe ratio: [[swipeRatio]]</div>
         </template>
       </dom-bind>
@@ -137,13 +137,11 @@
 
       function prevPage() {
         const currIndex = parseInt(pages.getAttribute('active-index'));
-        //pages.setAttribute('active-index', (currIndex - 1));
-        document.querySelector('pageIndex').activeIndex = currIndex - 1;
+        document.querySelector('sliding-pages').activeIndex = currIndex - 1;
       }
       function nextPage() {
         const currIndex = parseInt(pages.getAttribute('active-index'));
-        //pages.setAttribute('active-index', (currIndex + 1))
-        document.querySelector('pageIndex').activeIndex = currIndex + 1;
+        document.querySelector('sliding-pages').activeIndex = currIndex + 1;
       }
 
       const input = document.getElementById('pageIndex');
@@ -151,9 +149,7 @@
         e.preventDefault();
 
         const index = parseInt(e.target.value);
-        console.log(index)
-        document.querySelector('pageIndex').activeIndex = index;
-        //pages.setAttribute('active-index', index);
+        document.querySelector('sliding-pages').activeIndex = index;
       });
     </script>
   </demo-snippet>
