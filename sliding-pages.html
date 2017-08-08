@@ -69,6 +69,11 @@
             type: Number,
             value: 0.5,
           },
+          swipeRatio: {
+            type: Number,
+            notify: true,
+            readOnly: true,
+          },
           transitionTime: {
             type: Number,
           },
@@ -111,14 +116,15 @@
           return this._handleUp(evt);
         }
 
+        const dx = evt.detail.dx;
 
         this.prevDx = this.startDx;
-        this.startDx = Math.abs(evt.detail.dx);
+        this.startDx = Math.abs(dx);
         this.startTime = new Date().getTime();
 
-        const dx = evt.detail.dx;
         const ratio = (dx / this.activePageWidth) * 80;
-
+        const distToCover = Math.abs(this.activePageWidth - Math.abs(dx));
+        this._setSwipeRatio((Math.abs(dx) / this.activePageWidth) * 100);
         if (dx > 0) {
           if (this.activeIndex <= 0) {
             return;
