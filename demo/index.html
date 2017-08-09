@@ -89,7 +89,7 @@
       <dom-bind>
         <template>
           <div class="container">
-            <sliding-pages active-index="{{activeIndex}}" swipe-threshold="0.4" id="slidingPages" swipe-ratio="{{swipeRatio}}">
+            <sliding-pages active-index="{{activeIndex}}" swipe-threshold="0.4" id="slidingPages" swipe-ratio="{{swipeRatio}}" swipe-direction="{{swipeDirection}}">
               <div>
                 <h1>
                   Page 1
@@ -129,6 +129,7 @@
           <input type="number" placeholder="active-index" id="pageIndex">
           <div>Active index: <span id="activeIndex">[[activeIndex]]</span></div>
           <div>Swipe ratio: [[swipeRatio]]</div>
+          <div>Swipe direction: [[swipeDirection]]</div>
         </template>
       </dom-bind>
     </div>

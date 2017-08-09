@@ -74,8 +74,11 @@
             notify: true,
             readOnly: true,
           },
-          transitionTime: {
-            type: Number,
+          transitionTime: Number,
+          swipeDirection: {
+            type: String,
+            readOnly: true,
+            notify: true,
           },
           activeIndex: {
             type: Number,
@@ -126,6 +129,7 @@
         const distToCover = Math.abs(this.activePageWidth - Math.abs(dx));
         if (Math.abs(dx) <= this.activePageWidth) {
           if (dx > 0) {
+            this._setSwipeDirection('right');
             if (this.activeIndex <= 0) {
               return;
             }
@@ -135,6 +139,7 @@
             this.pages[this.activeIndex].ref.style.transform = `translateX(${dx}px)`;
           }
           if (dx < 0) {
+            this._setSwipeDirection('left');
             if (this.activeIndex >= this.pages.length - 1) {
               return;
             }
@@ -169,6 +174,7 @@
 
       _handleUp(evt) {
         const transition = `${this._getTransitionTime(evt)}s linear`;
+        this._setSwipeDirection('');
         this._completeSwipe = Math.abs(evt.detail.dx) > this.activePageWidth * this.swipeThreshold;
         if (this._completeSwipe) {
           // track has gone 60 left, bring in page to the right
