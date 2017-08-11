@@ -96,6 +96,7 @@
       }
       ready() {
         super.ready();
+        this.pages = [];
         //in case you want to populate the element using a dom-repeat
         this.addEventListener('dom-change', (e) => this._initPages());
       }
