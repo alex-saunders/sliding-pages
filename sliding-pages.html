@@ -166,7 +166,6 @@
           let speed = dist / time;
           speed = Math.max(speed, minSpeed);
           const distToCover = Math.abs(this.activePageWidth - Math.abs(evt.detail.dx));
-          console.log('distToCover', distToCover);
           return (distToCover / Math.abs(speed)) / 1000;
         }
         else {
