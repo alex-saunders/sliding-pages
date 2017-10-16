@@ -48,7 +48,7 @@
       }
       paper-fab:nth-of-type(2) {
         right: 8px;
-      } 
+      }
       sliding-pages div:nth-of-type(1) {
           --page-background-color: var(--paper-red-500);
       }
@@ -119,8 +119,19 @@
       </demo-snippet>
     </div>
     <script>
-      const pages = document.querySelector('sliding-pages');
+      var pages;
+      window.addEventListener('WebComponentsReady', function() {
+        pages = document.querySelector('sliding-pages');
 
+        const input = document.getElementById('pageIndex');
+        input.addEventListener('change', (e) => {
+          e.preventDefault();
+
+          const index = parseInt(e.target.value);
+          pages.setAttribute('active-index', index);
+        })
+      });
+      
       function prevPage() {
         const currIndex = parseInt(pages.getAttribute('active-index'));
         pages.setAttribute('active-index', (currIndex - 1));
@@ -129,14 +140,6 @@
         const currIndex = parseInt(pages.getAttribute('active-index'));
         pages.setAttribute('active-index', (currIndex + 1))
       }
-
-      const input = document.getElementById('pageIndex');
-      input.addEventListener('change', (e) => {
-        e.preventDefault();
-
-        const index = parseInt(e.target.value);
-        pages.setAttribute('active-index', index);
-      })
     </script>
   </body>
 </html>
