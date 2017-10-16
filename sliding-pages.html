@@ -78,7 +78,7 @@
       }
       connectedCallback() {
         super.connectedCallback();
-        
+
         this.pages = [];
 
         this.initialised = false;
@@ -101,7 +101,7 @@
           return this._handleUp(evt);
         }
 
-        
+
         this.prevDx = this.startDx;
         this.startDx = Math.abs(evt.detail.dx);
         this.startTime = new Date().getTime();
@@ -181,7 +181,10 @@
       }
 
       _initPages() {
-        const temp = Polymer.dom(this).querySelectorAll(':scope > div');
+        const temp = this.shadowRoot
+          .querySelector('slot')
+          .assignedNodes({flatten:true})
+          .filter(n => n.nodeType === Node.ELEMENT_NODE);
         for (let page of temp) {
           const obj = {
             ref: page,
@@ -195,11 +198,11 @@
           });
           this.pages.push(obj);
         }
-        
+
         this._sortPages();
         this._hideHiddenPages();
 
-        this.initialised = true;         
+        this.initialised = true;
       }
 
       _alterClasses(page, transition) {
@@ -229,19 +232,19 @@
 
       _outLeft(page, animate) {
         this._alterClasses(page, animate);
-        
+
         page.ref.classList.remove('right');
         page.ref.classList.add('left');
       }
 
       _in(pageIndex, animate) {
           this.activeIndex = pageIndex;
-          
+
           const page = this.pages[pageIndex];
           this.activePage = page;
 
           page.ref.classList.remove('out');
-      
+
           this._alterClasses(page, animate, true);
 
           requestAnimationFrame(() => {
@@ -274,13 +277,13 @@
         this._in(this.activeIndex, animateTime)
       }
 
-      _hideHiddenPages() {     
+      _hideHiddenPages() {
         for (let page of this.pages) {
           page.ref.style.transition = '';
           if (page !== this.pages[this.activeIndex]) {
             page.ref.classList.add('out');
           }
-        }     
+        }
       }
     }
 
