@@ -83,13 +83,28 @@
             type: Number,
             notify: true,
             observer: '_propertyChanged',
-          }
+          },
+          preventTracking: {
+            type: Boolean,
+            value: false,
+            observer: '_preventTrackingChanged',
+          },
+          isTracking: {
+            type: Boolean,
+            value: false,
+            notify: true,
+          },
         };
       }
       constructor() {
         super();
 
         Polymer.Gestures.addListener(this, 'track', e => this._handleTrack(e));
+      }
+
+
+      _preventTrackingChanged(prevent) {
+        this.dontTrack = prevent || false;
       }
 
       connectedCallback() {
@@ -109,13 +124,19 @@
       }
 
       _handleTrack(evt) {
+        if (this.dontTrack) {
+          return;
+        }
+
         if (evt.detail.state === "start") {
+          this.isTracking = true;
           this.activePageWidth = this.pages[this.activeIndex].ref.getBoundingClientRect().width;
           this.startX = evt.detail.x;
           return;
         }
 
         if (evt.detail.state === "end") {
+          this.isTracking = false;
           this.startDx = this.prevDx;
           return this._handleUp(evt);
         }
