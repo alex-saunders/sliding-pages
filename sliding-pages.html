@@ -11,7 +11,7 @@
 <dom-module id="sliding-pages">
   <template>
     <style>
-      :host {
+       :host {
         display: block;
         position: relative;
         height: 100%;
@@ -19,33 +19,35 @@
         overflow: hidden;
       }
 
-      :host ::slotted(*) {
+       :host ::slotted(*) {
         box-sizing: border-box;
       }
 
-      :host ::slotted(div) {
+       :host ::slotted(div) {
         display: block;
         position: absolute;
         opacity: 1;
-        padding: 8px;
         top: 0;
         left: 0;
         right: 0;
         width: 100%;
         height: 100%;
-        box-shadow: 0px 0 6px 2px rgba(0,0,0,0.2);
+        box-shadow: 0px 0 6px 2px rgba(0, 0, 0, 0.2);
         background-color: var(--page-background-color, #fff);
         z-index: 2;
       }
-      :host ::slotted(.right) {
+
+       :host ::slotted(.right) {
         transform: translateX(100%);
         z-index: 3;
       }
-      :host ::slotted(.left) {
+
+       :host ::slotted(.left) {
         transform: translateX(-80px);
         z-index: 1;
       }
-      :host ::slotted(.out) {
+
+       :host ::slotted(.out) {
         display: none !important;
       }
     </style>
@@ -62,13 +64,36 @@
             type: String,
             value: 'sliding-pages'
           },
+          swipeThreshold: {
+            type: Number,
+            value: 0.5,
+          },
+          swipeRatio: {
+            type: Number,
+            notify: true,
+            readOnly: true,
+          },
+          transitionTime: Number,
+          swipeDirection: {
+            type: String,
+            readOnly: true,
+            notify: true,
+          },
           activeIndex: {
             type: Number,
-            value: 0,
             notify: true,
-            reflectToAttribute: true,
             observer: '_propertyChanged',
-          }
+          },
+          preventTracking: {
+            type: Boolean,
+            value: false,
+            observer: '_preventTrackingChanged',
+          },
+          isTracking: {
+            type: Boolean,
+            value: false,
+            notify: true,
+          },
         };
       }
       constructor() {
@@ -76,97 +101,123 @@
 
         Polymer.Gestures.addListener(this, 'track', e => this._handleTrack(e));
       }
+
+
+      _preventTrackingChanged(prevent) {
+        this.dontTrack = prevent || false;
+      }
+
       connectedCallback() {
         super.connectedCallback();
-        
-        this.pages = [];
 
+        this.pages = [];
         this.initialised = false;
         this.prevPage = null;
         this.activePage = null;
-
+        if (!this.activeIndex) {
+          this.set('activeIndex', 0);
+        }
         this._initPages();
-
       }
 
       _handleTrack(evt) {
+        if (this.dontTrack) {
+          return;
+        }
+
         if (evt.detail.state === "start") {
+          this.isTracking = true;
           this.activePageWidth = this.pages[this.activeIndex].ref.getBoundingClientRect().width;
           this.startX = evt.detail.x;
           return;
         }
 
         if (evt.detail.state === "end") {
+          this.isTracking = false;
           this.startDx = this.prevDx;
           return this._handleUp(evt);
         }
 
-        
+        const dx = evt.detail.dx;
+
         this.prevDx = this.startDx;
-        this.startDx = Math.abs(evt.detail.dx);
+        this.startDx = Math.abs(dx);
         this.startTime = new Date().getTime();
 
-        const dx = evt.detail.dx;
         const ratio = (dx / this.activePageWidth) * 80;
-
-        if (dx > 0) {
-          if (this.activeIndex <= 0) {
-            return;
+        const distToCover = Math.abs(this.activePageWidth - Math.abs(dx));
+        if (Math.abs(dx) <= this.activePageWidth) {
+          if (dx > 0) {
+            this._setSwipeDirection('right');
+            if (this.activeIndex <= 0) {
+              return;
+            }
+            this.pages[this.activeIndex - 1].ref.classList.remove('out');
+            this.pages[this.activeIndex - 1].ref.classList.remove('left');
+            this.pages[this.activeIndex - 1].ref.style.transform = `translateX(${-(80 - ratio)}px)`;
+            this.pages[this.activeIndex].ref.style.transform = `translateX(${dx}px)`;
           }
-          this.pages[this.activeIndex - 1].ref.classList.remove('out');
-          this.pages[this.activeIndex - 1].ref.classList.remove('left');
-          this.pages[this.activeIndex - 1].ref.style.transform = `translateX(${-(80 - ratio)}px)`;
-          this.pages[this.activeIndex].ref.style.transform = `translateX(${dx}px)`;
+          if (dx < 0) {
+            this._setSwipeDirection('left');
+            if (this.activeIndex >= this.pages.length - 1) {
+              return;
+            }
+            this.pages[this.activeIndex + 1].ref.classList.remove('out');
+            this.pages[this.activeIndex + 1].ref.classList.remove('right');
+            this.pages[this.activeIndex + 1].ref.style.transform = `translateX(${this.activePageWidth - -dx}px)`;
+            this.pages[this.activeIndex].ref.style.transform = `translateX(${ratio}px)`;
+          }
+          this._setSwipeRatio((Math.abs(dx) / this.activePageWidth) * 100);
         }
-        if (dx < 0) {
-          if (this.activeIndex >= this.pages.length - 1) {
-            return;
-          }
-          this.pages[this.activeIndex + 1].ref.classList.remove('out');
-          this.pages[this.activeIndex + 1].ref.classList.remove('right');
-          this.pages[this.activeIndex + 1].ref.style.transform = `translateX(${this.activePageWidth - -dx}px)`;
-          this.pages[this.activeIndex].ref.style.transform = `translateX(${ratio}px)`;
+
+      }
+
+      _getTransitionTime(evt) {
+        if (!this.transitionTime) {
+          this.endTime = new Date().getTime();
+          this.endDx = Math.abs(evt.detail.dx);
+
+          const dist = this.startDx - this.endDx;
+          const minSpeed = this.activePageWidth / 300;
+          let time = this.endTime - this.startTime;
+          let speed = dist / time;
+          speed = Math.max(speed, minSpeed);
+          const distToCover = Math.abs(this.activePageWidth - Math.abs(evt.detail.dx));
+          return (distToCover / Math.abs(speed)) / 1000;
+        }
+        else {
+          return this.transitionTime;
         }
       }
 
       _handleUp(evt) {
-
-        this.endTime = new Date().getTime();
-        this.endDx = Math.abs(evt.detail.dx);
-
-        const dist = this.startDx - this.endDx;
-        const minSpeed = this.activePageWidth / 300;
-        let time = this.endTime - this.startTime;
-        let speed = dist / time;
-        speed = Math.max(speed, minSpeed);
-
-        const distToCover = Math.abs(this.activePageWidth - Math.abs(evt.detail.dx));
-        console.log('distToCover', distToCover);
-        time = (distToCover / Math.abs(speed)) / 1000;
-
-        const transition = `${time}s linear`;
-
-        // track has gone 60 left, bring in page to the right
-        if (evt.detail.dx >= (60)) {
-          if (this.activeIndex <= 0) {
-            return;
+        const transition = `${this._getTransitionTime(evt)}s linear`;
+        this._setSwipeDirection('');
+        this._completeSwipe = Math.abs(evt.detail.dx) > this.activePageWidth * this.swipeThreshold;
+        if (this._completeSwipe) {
+          // track has gone 60 left, bring in page to the right
+          if (evt.detail.dx >= (60)) {
+            if (this.activeIndex <= 0) {
+              return;
+            }
+            this.activeIndex--;
+          } else if (evt.detail.dx > 0) {
+            this._alterClasses(this.pages[this.activeIndex - 1], transition);
           }
-          this.activeIndex--;
-        } else if (evt.detail.dx > 0) {
-          this._alterClasses(this.pages[this.activeIndex - 1], transition);
-        }
 
-        // track has gone 60 right, bring in page to the left
-        if (evt.detail.dx <= (-60)) {
-          if (this.activeIndex >= this.pages.length - 1) {
-            return;
+          // track has gone 60 right, bring in page to the left
+          if (evt.detail.dx <= (-60)) {
+            if (this.activeIndex >= this.pages.length - 1) {
+              return;
+            }
+            this.activeIndex++;
+          } else if (evt.detail.dx < 0) {
+            this._alterClasses(this.pages[this.activeIndex + 1], transition);
           }
-          this.activeIndex++;
-        } else if (evt.detail.dx < 0) {
-          this._alterClasses(this.pages[this.activeIndex + 1], transition);
+          this._sortPages(transition);
         }
-
         this._sortPages(transition);
+        this._setSwipeRatio(0);
       }
 
       _propertyChanged() {
@@ -195,19 +246,19 @@
           });
           this.pages.push(obj);
         }
-        
+
         this._sortPages();
         this._hideHiddenPages();
 
-        this.initialised = true;         
+        this.initialised = true;
       }
 
       _alterClasses(page, transition) {
         page.ref.style.transform = '';
 
         if (transition) {
-            page.ref.style.transition = `all ${transition}`;
-            page.transitioning = true;
+          page.ref.style.transition = `all ${transition}`;
+          page.transitioning = true;
         }
       }
 
@@ -229,29 +280,29 @@
 
       _outLeft(page, animate) {
         this._alterClasses(page, animate);
-        
+
         page.ref.classList.remove('right');
         page.ref.classList.add('left');
       }
 
       _in(pageIndex, animate) {
-          this.activeIndex = pageIndex;
-          
-          const page = this.pages[pageIndex];
-          this.activePage = page;
+        this.activeIndex = pageIndex;
 
-          page.ref.classList.remove('out');
-      
-          this._alterClasses(page, animate, true);
+        const page = this.pages[pageIndex];
+        this.activePage = page;
 
+        page.ref.classList.remove('out');
+
+        this._alterClasses(page, animate, true);
+
+        requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                  page.ref.classList.remove('left');
-                  page.ref.classList.remove('right');
-              });
+            page.ref.classList.remove('left');
+            page.ref.classList.remove('right');
           });
+        });
 
-          page.initialised = true;
+        page.initialised = true;
       }
       _sortPages(animateTime) {
         if (this.activeIndex < 0 || this.activeIndex >= this.pages.length) {
@@ -274,13 +325,13 @@
         this._in(this.activeIndex, animateTime)
       }
 
-      _hideHiddenPages() {     
+      _hideHiddenPages() {
         for (let page of this.pages) {
           page.ref.style.transition = '';
           if (page !== this.pages[this.activeIndex]) {
             page.ref.classList.add('out');
           }
-        }     
+        }
       }
     }
 
