@@ -110,17 +110,14 @@
       connectedCallback() {
         super.connectedCallback();
 
+        this.pages = [];
         this.initialised = false;
         this.prevPage = null;
         this.activePage = null;
-        //in case you want to populate the component using a dom-repeat
-        this.addEventListener('dom-change', (e) => {
-          this.pages = [];
-          if (!this.activeIndex) {
-            this.set('activeIndex', 0);
-          }
-          this._initPages();
-        });
+        if (!this.activeIndex) {
+          this.set('activeIndex', 0);
+        }
+        this._initPages();
       }
 
       _handleTrack(evt) {

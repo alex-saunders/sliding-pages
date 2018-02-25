@@ -90,38 +90,11 @@
         <template>
           <div class="container">
             <sliding-pages active-index="{{activeIndex}}" swipe-threshold="0.4" id="slidingPages" swipe-ratio="{{swipeRatio}}" swipe-direction="{{swipeDirection}}">
-              <div>
-                <h1>
-                  Page 1
-                </h1>
+              <template is="dom-repeat" items='["Page 1","Page 2","Page 3","Page 4"]'>
                 <div>
-                  Child div
+                    [[item]]
                 </div>
-              </div>
-
-              <div>
-                <h1>
-                  Page 2
-                </h1>
-              </div>
-
-              <div>
-                <h1>
-                  Page 3
-                </h1>
-              </div>
-
-              <div>
-                <h1>
-                  Page 4
-                </h1>
-              </div>
-
-              <div>
-                <h1>
-                  Page 5
-                </h1>
-              </div>
+              </template>
             </sliding-pages>
           </div>
           <button onclick="prevPage()">Previous Page (active-index--)</button>
@@ -137,11 +110,11 @@
       const pages = document.querySelector('sliding-pages');
 
       function prevPage() {
-        const currIndex = parseInt(pages.getAttribute('active-index'));
+        const currIndex = parseInt(pages.activeIndex);
         document.querySelector('sliding-pages').activeIndex = currIndex - 1;
       }
       function nextPage() {
-        const currIndex = parseInt(pages.getAttribute('active-index'));
+        const currIndex = parseInt(pages.activeIndex);
         document.querySelector('sliding-pages').activeIndex = currIndex + 1;
       }
 
